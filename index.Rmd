@@ -1,0 +1,72 @@
+---
+title: "Practical Machine Learning - Prediction Writeup"
+author: "Manish Reddy Jannepally"
+date: "September 17, 2017"
+output: html_document
+---
+##Overview
+
+The goal of this project is to predict the manner in which the 6 participants did the exercise using the data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. The different ways of doing exercise is classified into 5 classes. This is the "classe" variable in the training set.
+
+##Getting and loading the data
+
+The training data for this project are available here:
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv
+
+The test data are available here:
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv
+
+
+The data for this project come from this source: http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har
+
+```{r Getting & Loading the data,echo=TRUE, cache=TRUE}
+rm(list = ls())
+train_url = "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+test_url = "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+download.file(train_url,destfile = "pm1-training.csv",mode = 'wb')
+train_data = read.csv("pm1-training.csv",header = TRUE, na.strings = c("NA"," ","#DIV/0!"))
+download.file(test_url,destfile = "pm1-testing.csv", mode = 'wb')
+testing = read.csv("pm1-testing.csv",header = TRUE,na.strings = c("NA","#DIV/0!"," "))
+dim(train_data);dim(testing)
+```
+
+I am going to divide the train_data into training and validation sets using caret. I have observed a lot of data as NA, #DIV/0!, empty cells. so, considered them all as NAs while loading the data.
+
+```{r slicing the data, echo=TRUE,cache=TRUE}
+set.seed(1839)
+library(caret)
+inTrain = createDataPartition(train_data$classe,p=0.65, list = FALSE)
+training = train_data[inTrain,]
+validation = train_data[-inTrain,]
+dim(training);dim(validation)
+```
+
+#Preproccesing
+
+As there are many NAs, #DIV/0!, empty cells we can remove them as they are of no use. If the model fails, we can add them back plan another model.
+
+```{r removing NA, echo=TRUE, cache=TRUE}
+training = training[,!apply(training,2,function(x)any(is.na(x)))]
+validation = validation[,!apply(validation,2,function(x)any(is.na(x)))]
+dim(training);dim(validation)
+```
+
+#Model building
+
+I will try the classification with Random Forest method. Because many (me too) believe that this as the best classification model and random forest takes care of Cross Validation too. If the accuracy is not good,ll try another method.
+
+```{r Random Forest, echo=TRUE, cache=TRUE}
+library(randomForest)
+model = randomForest(classe~.,data = training,importance = TRUE)
+model
+```
+
+Seems the model is great and the cross validation (internal)error is also very very low (0.01). Lets try this model on the validation set.
+
+```{r model on validation set, echo=TRUE, cache=TRUE}
+pred = predict(model,newdata = validation)
+confusionMatrix(pred,validation$classe)
+```
+
+Accuracy is 100% on validation Set. The method I chose, classified the validation set 100% accurately.No need of model improvisation or any other model.
+
