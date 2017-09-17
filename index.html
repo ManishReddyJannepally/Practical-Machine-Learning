@@ -145,15 +145,13 @@ dim(train_data);dim(testing)</code></pre>
 <pre><code>## [1]  20 160</code></pre>
 <p>I am going to divide the train_data into training and validation sets using caret. I have observed a lot of data as NA, #DIV/0!, empty cells. so, considered them all as NAs while loading the data.</p>
 <pre class="r"><code>set.seed(1839)
-library(caret)</code></pre>
-<pre><code>## Loading required package: lattice</code></pre>
-<pre><code>## Loading required package: ggplot2</code></pre>
-<pre class="r"><code>inTrain = createDataPartition(train_data$classe,p=0.65, list = FALSE)
+library(caret)
+inTrain = createDataPartition(train_data$classe,p=0.60,list = FALSE)
 training = train_data[inTrain,]
 validation = train_data[-inTrain,]
 dim(training);dim(validation)</code></pre>
-<pre><code>## [1] 12757   160</code></pre>
-<pre><code>## [1] 6865  160</code></pre>
+<pre><code>## [1] 11776   160</code></pre>
+<pre><code>## [1] 7846  160</code></pre>
 </div>
 <div id="preproccesing" class="section level1">
 <h1>Preproccesing</h1>
@@ -167,15 +165,8 @@ dim(training);dim(validation)</code></pre>
 <div id="model-building" class="section level1">
 <h1>Model building</h1>
 <p>I will try the classification with Random Forest method. Because many (me too) believe that this as the best classification model and random forest takes care of Cross Validation too. If the accuracy is not good,ll try another method.</p>
-<pre class="r"><code>library(randomForest)</code></pre>
-<pre><code>## randomForest 4.6-12</code></pre>
-<pre><code>## Type rfNews() to see new features/changes/bug fixes.</code></pre>
-<pre><code>## 
-## Attaching package: 'randomForest'</code></pre>
-<pre><code>## The following object is masked from 'package:ggplot2':
-## 
-##     margin</code></pre>
-<pre class="r"><code>model = randomForest(classe~.,data = training,importance = TRUE)
+<pre class="r"><code>library(randomForest)
+model = randomForest(classe~.,data = training,importance = TRUE)
 model</code></pre>
 <pre><code>## 
 ## Call:
@@ -226,7 +217,7 @@ confusionMatrix(pred,validation$classe)</code></pre>
 ## Detection Rate         0.2845   0.1934   0.1744   0.1639   0.1838
 ## Detection Prevalence   0.2845   0.1934   0.1744   0.1639   0.1838
 ## Balanced Accuracy      1.0000   1.0000   1.0000   1.0000   1.0000</code></pre>
-<p>Accuracy is 100% on validation Set. The method I chose, classified the validation set 100% accurately.No need of model improvisation or any other model.</p>
+<p>Accuracy is 100% on validation Set.The out of Sample error is 0 here. The method I chose, classified the validation set 100% accurately.No need of model improvisation or any other model.</p>
 </div>
 
 

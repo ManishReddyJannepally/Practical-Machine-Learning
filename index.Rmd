@@ -35,7 +35,7 @@ I am going to divide the train_data into training and validation sets using care
 ```{r slicing the data, echo=TRUE,cache=TRUE}
 set.seed(1839)
 library(caret)
-inTrain = createDataPartition(train_data$classe,p=0.65, list = FALSE)
+inTrain = createDataPartition(train_data$classe,p=0.60,list = FALSE)
 training = train_data[inTrain,]
 validation = train_data[-inTrain,]
 dim(training);dim(validation)
@@ -68,5 +68,5 @@ pred = predict(model,newdata = validation)
 confusionMatrix(pred,validation$classe)
 ```
 
-Accuracy is 100% on validation Set. The method I chose, classified the validation set 100% accurately.No need of model improvisation or any other model.
+Accuracy is 100% on validation Set.The out of Sample error is 0 here. The method I chose, classified the validation set 100% accurately.No need of model improvisation or any other model.
 
